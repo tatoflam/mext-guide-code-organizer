@@ -12,7 +12,6 @@ class CodeNode:
         self.subject = subject
         self.description_chain = ['']
 
-codes = []
 used_code_dict = {}
 text_dict = {}
 subject_dict = {}
@@ -61,6 +60,12 @@ def print_tree(node, level=0):
     for child in node.children:
         print_tree(child, level + 1)
 
+def print_code_tree(node, level=0):
+    if node.code:
+        print(f"{'  ' * level}- {node.code}")
+    for child in node.children:
+        print_code_tree(child, level + 1)
+
 def dump_to_csv(node, file_path):
     rows = []
 
@@ -102,8 +107,9 @@ def main(file_path):
     subject_dict = {code: subjects[i].strip() for i, code in enumerate(codes)}
     
     root_node = build_code_tree(codes)
-    deepest_level = find_deepest_level(root_node)  
-    print_tree(root_node)
+    # deepest_level = find_deepest_level(root_node)  
+    # print_tree(root_node)
+    print_code_tree(root_node)
     dump_to_csv(root_node, file_path)
 
 
