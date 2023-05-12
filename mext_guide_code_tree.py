@@ -83,7 +83,8 @@ def dump_to_csv(node, file_path):
     dump_node(node)
     
     file_base_name = os.path.splitext(file_path)
-    pd.DataFrame(rows, columns=['Code', 'Subject', 'Descriptions']).to_csv(file_base_name[0] + "_out.csv", encoding="cp932")
+    # Omit the blank row
+    pd.DataFrame(rows[1:], columns=['Code', 'Subject', 'Descriptions']).to_csv(file_base_name[0] + "_out.csv", encoding="cp932", index=False)
     # print(rows)
 
 def find_deepest_level(node, level=0):
