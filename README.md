@@ -27,10 +27,10 @@ $ (env) python ./mext_guide_code_tree.py ./data/000102025_JH_83V11.cv
 ```
 
 - Input(文科省のサイトからダウンロードしたCSVファイル): 
-  - (Sample) ./data/000102025_JH_83V11.csv
+  - (Sample) ./data/000102025_83V11_JH.csv
 
 - Output:
-  - (Sample) ./data/000102025_JH_83V11_out.csv
+  - (Sample) ./data/000102025_83V11_JH_out.csv
 
 
 ### Requirement
