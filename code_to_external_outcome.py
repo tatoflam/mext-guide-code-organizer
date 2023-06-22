@@ -3,9 +3,10 @@ import argparse
 import pandas as pd
 from datetime import datetime
 import pytz
-
 import csv
 import codecs
+
+from constants import school_dict, syllabus_id_dict
 
 def remove_sequential_line_feeds(string):
     #while '\n\n' in string:
@@ -51,15 +52,6 @@ def main(file_path, syllabus_id):
     elif school_code in ["3","4","6","B"]:
         secondary = True
     
-    school_dict = {
-        "1":"幼稚園",
-        "2":"小学校",
-        "3":"中学校",
-        "4":"高等学校",
-        "5":"特別支援学校幼稚部",
-        "6":"特別支援学校小学部・中学部",
-        "B":"特別支援学校高等部"
-    }
     school = school_dict[school_code]
     
     outcome_columns = ["PartitionKey","RowKey","Timestamp",
@@ -87,7 +79,7 @@ def main(file_path, syllabus_id):
     outcome_df["Senior@type"] = "Boolean"
     outcome_df["Subject"] = school + "|" + df["Subject"]
     outcome_df["Subject@type"]="String"
-    outcome_df["Syllabus"] = syllabus_id
+    outcome_df["Syllabus"] = syllabus_id_dict[syllabus_id]
     outcome_df["Syllabus@type"] = "String"
     outcome_df["SyllabusId"] = syllabus_id
     outcome_df["SyllabusId@type"] = "String"

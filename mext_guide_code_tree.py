@@ -3,6 +3,10 @@ import re
 import argparse
 import pandas as pd
 
+from collections import defaultdict
+
+pd.set_option('display.float_format', lambda x:'%,g' % x) 
+
 class CodeNode:
     
     def __init__(self, code, subject, description):
@@ -49,9 +53,31 @@ def build_code_tree(code_list):
     build_tree(root_node, code_list, 1)
     return root_node
 
-def read_codes_from_csv(file_path, code_col, text_col, subject_col):
-    df = pd.read_csv(file_path, encoding="cp932")
-    return df[code_col].tolist(), df[text_col].tolist(), df[subject_col].tolist()
+def exp_to_digit_str(x):
+    if x[-4:-2] == "E+" :
+        d = str(int(float(x)))
+        # print(d)
+    else:
+        d = x
+    return d
+
+def read_codes_from_csv(file_path, subject_col, code_col, text_col):
+    types = str
+    # if code_col == "学習指導要領コード":
+    #     types = {
+    #         "教科等":"str", "No":"str",
+    #         "学習指導要領コード":"str",
+    #         "学習指導要領テキスト":"str"
+    #     }
+    
+    df = pd.read_csv(file_path, dtype=types, encoding="cp932")
+    
+    # CSVが"指数表記の文字列 (例: 8.21E+15)になっている場合があるので、
+    # その場合に16桁の数値コードに変換する
+    df[code_col] = df[code_col].apply(lambda x: exp_to_digit_str(x))
+    
+    # print(df.head(100))
+    return df[code_col].astype(str).tolist(), df[text_col].tolist(), df[subject_col].tolist()
 
 
 def print_tree(node, level=0):
@@ -93,16 +119,25 @@ def find_deepest_level(node, level=0):
     else:
         return max(find_deepest_level(child, level + 1) for child in node.children)
 
-def main(file_path):
-    subject_col = '教科等'
-    code_col = '学習指導要領コード' 
-    text_col = '学習指導要領テキスト'
+def main(file_path, stype):
     global used_code_dict
     global text_dict
     global subject_dict
+
+    subject_col = '教科等'
     
-    codes, texts, subjects = read_codes_from_csv(file_path, 
-                                       code_col, text_col, subject_col)
+    print(f"stype: {stype}")
+    
+    # 幼稚園指導要領の場合
+    if stype == "k":
+        code_col = '教育要領コード'
+        text_col = '教育要領テキスト'
+        
+    else:
+        code_col = '学習指導要領コード'
+        text_col = '学習指導要領テキスト'
+        
+    codes, texts, subjects = read_codes_from_csv(file_path, subject_col, code_col, text_col)
     used_code_dict = {code: False for code in codes}
     text_dict = {code: texts[i] for i, code in enumerate(codes)}
     subject_dict = {code: subjects[i].strip() for i, code in enumerate(codes)}
@@ -117,6 +152,8 @@ def main(file_path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Process a CSV file containing codes and build a tree structure.")
     parser.add_argument("file_path", help="Path to the CSV file containing the codes.")
+    parser.add_argument("stype", help="幼稚園指導要領の場合、type=k.", default="g")
+    
     args = parser.parse_args()
     
-    main(args.file_path)
+    main(args.file_path, args.stype)

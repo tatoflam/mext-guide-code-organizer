@@ -19,19 +19,39 @@ $ deactivate
 
 ### Run
 
-On the virtual environment, run `python ./mext_guide_code_tree.py <csv file path>`
+#### mext_guide_code_tree.py
+
+On the virtual environment, run `python ./mext_guide_code_tree.py <csv file path> <school type>`
 
 ```
 $ source env/bin/activate
-$ (env) python ./mext_guide_code_tree.py ./data/000102025_JH_83V11.cv
+$ (env) python ./mext_guide_code_tree.py ./data/000102025_JH_83V11.csv g
 ```
 
-- Input(文科省のサイトからダウンロードしたCSVファイル): 
-  - (Sample) ./data/000102025_83V11_JH.csv
+- Input
+  - File path(文科省のサイトからダウンロードしたCSVファイル)のパス: 
+    - (Sample) ./data/000102025_83V11_JH.csv
+  - School type
+    - k: 幼稚園教育要領
+    - g: 小学校・中学校・高等学校学習指導要領
 
 - Output:
   - (Sample) ./data/000102025_83V11_JH_out.csv
 
+#### code_to_external_outcome.py
+
+```
+python code_to_external_outcome.py ./data/000102025_83V11_JH_out.csv 83V11
+```
+
+- Input
+  - File path (mext_guide_code_tree.pyの結果ファイル)のパス(utf-8形式): 
+    - (Sample) ./data/000147154_86V12_SSG1-9_out.csv 
+  - Syllabus ID
+    - e.g. 83V11
+    - SYllabus IDとconstants.pyのディクショナリのキーを事前に合わせておくこと
+- Output
+  - (Sample) ./000102025_83V11_JH_out_externaloutcomes_utf8.csv
 
 ### Requirement
 

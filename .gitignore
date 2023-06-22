@@ -1,2 +1,5 @@
 env
 .DS_Store
+*zip
+__pychache__
+*pyc
