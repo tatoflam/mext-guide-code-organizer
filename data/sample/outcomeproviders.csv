@@ -1,0 +1,8 @@
+PartitionKey,RowKey,Created,Created@type,Market,Market@type,Name,Name@type,MarketDefault,MarketDefault@type
+AusVicEdu,AusVicEdu,2023-10-02T16:09:51.8279637Z,DateTime,en-AU,String,Victorian Curriculum and Assessment Authority,String,,
+Auscecqa,Auscecqa,2023-10-02T21:07:56.0311584Z,DateTime,en-AU,String,Australian Children's Education & Care Quality Authority,String,,
+CommonCore,CommonCore,2023-10-06T10:40:07.7260278Z,DateTime,en-US,String,Common Core State Standards,String,true,Boolean
+ccLouisiana,ccLouisiana,2023-10-04T08:59:54.9204383Z,DateTime,en-US,String,Louisiana Department of Education,String,,
+curriculumNsw,curriculumNsw,2023-10-01T12:26:31.9891237Z,DateTime,en-AU,String,Curriculum NSW,String,,
+curriculumWa,curriculumWa,2023-10-06T21:01:24.1140814Z,DateTime,en-AU,String,Western Australia School Curriculum and Standards Authority,String,false,Boolean
+v9AusCurriculum,v9AusCurriculum,2023-10-06T10:40:32.3103512Z,DateTime,en-AU,String,Australian Curriculum V9,String,true,Boolean

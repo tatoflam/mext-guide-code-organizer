@@ -3,7 +3,7 @@ import re
 import argparse
 import pandas as pd
 
-from collections import defaultdict
+from util import exp_to_digit_str
 
 pd.set_option('display.float_format', lambda x:'%,g' % x) 
 
@@ -52,14 +52,6 @@ def build_code_tree(code_list):
     root_node = CodeNode('','','')
     build_tree(root_node, code_list, 1)
     return root_node
-
-def exp_to_digit_str(x):
-    if x[-4:-2] == "E+" :
-        d = str(int(float(x)))
-        # print(d)
-    else:
-        d = x
-    return d
 
 def read_codes_from_csv(file_path, subject_col, code_col, text_col):
     types = str

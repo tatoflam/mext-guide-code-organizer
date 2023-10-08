@@ -3,76 +3,74 @@ import argparse
 import pandas as pd
 from datetime import datetime
 import pytz
-import csv
-import codecs
 
 from constants import school_dict, syllabus_id_dict
+from util import sjis_to_utf 
 
-def remove_sequential_line_feeds(string):
-    #while '\n\n' in string:
-    string = string.replace('\n', '')
-    return string
-
-def sjis_to_utf(file_path):
-    
-    file_base_name = os.path.splitext(file_path)
-    out_file = file_base_name[0] + "_utf8.csv" 
-    
-    # Open the source file with Shift-JIS encoding
-    with codecs.open(file_path, 'r', 'cp932') as sjis:
-        # Read the CSV
-        reader = csv.reader(sjis)
-
-        # Open a new file with UTF-8 encoding
-        with codecs.open(out_file, 'w', 'utf-8') as utf:
-            writer = csv.writer(utf)
-
-            for row in reader:
-                new_row = [remove_sequential_line_feeds(field) for field in row]
-                writer.writerow(new_row)
 pd.options.display.max_columns = None
 
 def main(file_path, syllabus_id):
     df = pd.read_csv(file_path, encoding="cp932")
     
     now = datetime.now(pytz.utc)
-    timestamp_string = now.strftime("%Y-%m-%dT%H:%M:%S.%f%z")
+    timestamp_string = current_time = datetime.utcnow().isoformat(timespec='microseconds') + 'Z'
     
     partitionKey = "mextJp"
     rowKeyPrefix = partitionKey + "-" + syllabus_id + "-"
     
+    kinder = False
     primary = False
     secondary = False
     senior = False
     
     # 2nd digit of syllabus id represents the school code. 
     school_code = syllabus_id[1]
-    if school_code in ["1","2","5","6"]:
+    if school_code in ["1","5"]:
+        kinder = True
+    elif school_code in ["2","6"]:
         primary = True
-    elif school_code in ["3","4","6","B"]:
+    elif school_code in ["3","6"]:
         secondary = True
+    elif school_code in ["4","B"]:
+        senior = True
     
     school = school_dict[school_code]
     
-    outcome_columns = ["PartitionKey","RowKey","Timestamp",
-                       "OutcomeCode","OutcomeCode@type",
-                       "OutcomeDescription","OutcomeDescription@type",
-                       "Owner","Owner@type","Primary","Primary@type",
-                       "Secondary","Secondary@type","Senior","Senior@type",
-                       "Subject","Subject@type","Syllabus","Syllabus@type",
-                       "SyllabusId","SyllabusId@type"]
+
+    # outcome_columns = ["PartitionKey","RowKey","Timestamp",
+    #                    "OutcomeCode","OutcomeCode@type",
+    #                    "OutcomeDescription","OutcomeDescription@type",
+    #                    "Owner","Owner@type","Primary","Primary@type",
+    #                    "Secondary","Secondary@type","Senior","Senior@type",
+    #                    "Subject","Subject@type","Syllabus","Syllabus@type",
+    #                    "SyllabusId","SyllabusId@type"]
+     
+    outcome_columns = ["PartitionKey","RowKey",
+                       "Code","Code@type","Created","Created@type",
+                       "Description","Description@type",
+                       "Primary","Primary@type",
+                       "Provider","Provider@type",
+                       "ProviderId","ProviderId@type",
+                       "Secondary","Secondary@type",
+                       "Senior","Senior@type",
+                       "Subject","Subject@type",
+                       "Syllabus","Syllabus@type",
+                       "SyllabusId,SyllabusId@type",
+                       "Y0","Y0@type","Y1","Y1@type","Y10","Y10@type","Y11","Y11@type","Y12","Y12@type","Y2","Y2@type","Y3","Y3@type","Y4","Y4@type","Y5","Y5@type","Y6","Y6@type","Y7","Y7@type","Y8","Y8@type","Y9","Y9@type"]
+    
     outcome_df = pd.DataFrame(columns=outcome_columns)
     outcome_df["RowKey"] = rowKeyPrefix + df["Code"]
     outcome_df["PartitionKey"] = partitionKey
-    outcome_df["Timestamp"] = timestamp_string
-    outcome_df["OutcomeCode"] = df["Code"]
-    outcome_df["OutcomeCode@type"] = "String"
-    outcome_df["OutcomeDescription"] = df["Descriptions"]
-    outcome_df["OutcomeDescription@type"] = "String"
-    outcome_df["Owner"] = "MEXT of Japan"
-    outcome_df["Owner@type"] = "String"
+    outcome_df["Code"] = df["Code"]
+    outcome_df["Code@type"] = "String"
+    outcome_df["Created"] = timestamp_string
+    outcome_df["Created@type"] = "DateTime"
+    outcome_df["Description"] = df["Descriptions"]
+    outcome_df["Description@type"] = "String"
     outcome_df["Primary"] = primary
     outcome_df["Primary@type"] = "Boolean"
+    outcome_df["Provider"] = "MEXT of Japan"
+    outcome_df["Provider@type"] = "String"
     outcome_df["Secondary"] = secondary
     outcome_df["Secondary@type"] = "Boolean"
     outcome_df["Senior"] = senior
@@ -83,6 +81,32 @@ def main(file_path, syllabus_id):
     outcome_df["Syllabus@type"] = "String"
     outcome_df["SyllabusId"] = syllabus_id
     outcome_df["SyllabusId@type"] = "String"
+    outcome_df["Y0"] = kinder
+    outcome_df["Y0@type"] = "Boolean"
+    outcome_df["Y1"] = primary
+    outcome_df["Y1@type"] = "Boolean"
+    outcome_df["Y10"] = senior
+    outcome_df["Y10@type"] = "Boolean"
+    outcome_df["Y11"] = senior
+    outcome_df["Y11@type"] = "Boolean"
+    outcome_df["Y12"] = senior
+    outcome_df["Y12@type"] = "Boolean"
+    outcome_df["Y2"] = primary
+    outcome_df["Y2@type"] = "Boolean"
+    outcome_df["Y3"] = primary
+    outcome_df["Y3@type"] = "Boolean"
+    outcome_df["Y4"] = primary
+    outcome_df["Y4@type"] = "Boolean"
+    outcome_df["Y5"] = primary
+    outcome_df["Y5@type"] = "Boolean"
+    outcome_df["Y6"] = primary
+    outcome_df["Y6@type"] = "Boolean"
+    outcome_df["Y7"] = secondary
+    outcome_df["Y7@type"] = "Boolean"
+    outcome_df["Y8"] = secondary
+    outcome_df["Y8@type"] = "Boolean"
+    outcome_df["Y9"] = secondary
+    outcome_df["Y9@type"] = "Boolean"
     
     print(outcome_df.head())
     file_base_name = os.path.splitext(file_path)
